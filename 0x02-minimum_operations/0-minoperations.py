@@ -1,16 +1,19 @@
-def minOperations(n):
-    if n <= 1:
-        return 0
-    
-    f_number = 0
-    s_number = 2
-    
-    while n > 1:
-        if n % s_number == 0:
-            n //= s_number
-            f_number += s_number
-        else:
-            s_number += 1
-    
-    return f_number
+#!/usr/bin/python3
+"""
+Defines a function that calculates the fewest number of operations
+needed to result in exactly n H characters in the file.
+"""
 
+
+def minOperations(n):
+    """Calculates the fewest number of operations needed to result in
+        exactly n H characters in the file."""
+    sumfactors = 0
+    i = 2
+    while i * i <= n:
+        if n % i == 0:
+            n //= i
+            sumfactors += i
+        else:
+            i += 1
+    return sumfactors + n if n > 1 else sumfactors
