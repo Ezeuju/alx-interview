@@ -1,29 +1,43 @@
 #!/usr/bin/python3
-""" Module for Pascal's triangle """
+import sys
 
 
-def pascal_triangle(n):
-    """ Returns list of lists of ints representing Pascal’s triangle of n """
+def print_statistics(total_file_size, status_counts):
+    print(f"File size: {total_file_size}")
+    for status_code, count in sorted(status_counts.items()):
+        print(f"{status_code}: {count}")
 
-    if n <= 0:
-        return []
 
-    pascal = [[1]]
-    if n == 1:
-        return pascal
+def main():
+    total_file_size = 0
+    status_counts = {}
 
-    for i in range(1, n):
-        left = -1
-        right = 0
-        in_pas = []
-        for j in range(i+1):
-            num = 0
-            if left > -1:
-                num += pascal[i - 1][left]
-            if right < i:
-                num += pascal[i - 1][right]
-            left += 1
-            right += 1
-            in_pas.append(num)
-        pascal.append(in_pas)
-    return pascal
+    try:
+        line_number = 0
+        for line in sys.stdin:
+            line_number += 1
+            line = line.strip()
+
+            # Parse the line in the given format: <IP> - [<date>] "GET /projects/260 HTTP/1.1" <status code> <file size>
+            parts = line.split()
+            if len(parts) != 7 or parts[5][1:] not in ['200', '301', '400', '401', '403', '404', '405', '500']:
+                continue
+
+            status_code = parts[5][1:]
+            file_size = int(parts[6])
+
+            # Update total file size and status code counts
+            total_file_size += file_size
+            status_counts[status_code] = status_counts.get(status_code, 0) + 1
+
+            if line_number % 10 == 0:
+                print_statistics(total_file_size, status_counts)
+
+    except KeyboardInterrupt:
+        # In case of CTRL + C, print the statistics gathered so far
+        print_statistics(total_file_size, status_counts)
+        sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
