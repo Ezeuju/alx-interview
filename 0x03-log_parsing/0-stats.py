@@ -1,43 +1,45 @@
 #!/usr/bin/python3
+
+"""Script that reads stdin line by line and computes metrics"""
+
 import sys
 
 
-def print_statistics(total_file_size, status_counts):
-    print(f"File size: {total_file_size}")
-    for status_code, count in sorted(status_counts.items()):
-        print(f"{status_code}: {count}")
+def printsts(dic, size):
+    """ WWPrints information """
+    print("File size: {:d}".format(size))
+    for i in sorted(dic.keys()):
+        if dic[i] != 0:
+            print("{}: {:d}".format(i, dic[i]))
 
 
-def main():
-    total_file_size = 0
-    status_counts = {}
+sts = {"200": 0, "301": 0, "400": 0, "401": 0, "403": 0,
+       "404": 0, "405": 0, "500": 0}
 
-    try:
-        line_number = 0
-        for line in sys.stdin:
-            line_number += 1
-            line = line.strip()
+count = 0
+size = 0
 
-            # Parse the line in the given format: <IP> - [<date>] "GET /projects/260 HTTP/1.1" <status code> <file size>
-            parts = line.split()
-            if len(parts) != 7 or parts[5][1:] not in ['200', '301', '400', '401', '403', '404', '405', '500']:
-                continue
+try:
+    for line in sys.stdin:
+        if count != 0 and count % 10 == 0:
+            printsts(sts, size)
 
-            status_code = parts[5][1:]
-            file_size = int(parts[6])
+        stlist = line.split()
+        count += 1
 
-            # Update total file size and status code counts
-            total_file_size += file_size
-            status_counts[status_code] = status_counts.get(status_code, 0) + 1
+        try:
+            size += int(stlist[-1])
+        except:
+            pass
 
-            if line_number % 10 == 0:
-                print_statistics(total_file_size, status_counts)
-
-    except KeyboardInterrupt:
-        # In case of CTRL + C, print the statistics gathered so far
-        print_statistics(total_file_size, status_counts)
-        sys.exit(0)
+        try:
+            if stlist[-2] in sts:
+                sts[stlist[-2]] += 1
+        except:
+            pass
+    printsts(sts, size)
 
 
-if __name__ == "__main__":
-    main()
+except KeyboardInterrupt:
+    printsts(sts, size)
+    raise
