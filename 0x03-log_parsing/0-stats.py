@@ -1,29 +1,45 @@
 #!/usr/bin/python3
-""" Module for Pascal's triangle """
+
+"""Script that reads stdin line by line and computes metrics"""
+
+import sys
 
 
-def pascal_triangle(n):
-    """ Returns list of lists of ints representing Pascal’s triangle of n """
+def printsts(dic, size):
+    """ WWPrints information """
+    print("File size: {:d}".format(size))
+    for i in sorted(dic.keys()):
+        if dic[i] != 0:
+            print("{}: {:d}".format(i, dic[i]))
 
-    if n <= 0:
-        return []
 
-    pascal = [[1]]
-    if n == 1:
-        return pascal
+sts = {"200": 0, "301": 0, "400": 0, "401": 0, "403": 0,
+       "404": 0, "405": 0, "500": 0}
 
-    for i in range(1, n):
-        left = -1
-        right = 0
-        in_pas = []
-        for j in range(i+1):
-            num = 0
-            if left > -1:
-                num += pascal[i - 1][left]
-            if right < i:
-                num += pascal[i - 1][right]
-            left += 1
-            right += 1
-            in_pas.append(num)
-        pascal.append(in_pas)
-    return pascal
+count = 0
+size = 0
+
+try:
+    for line in sys.stdin:
+        if count != 0 and count % 10 == 0:
+            printsts(sts, size)
+
+        stlist = line.split()
+        count += 1
+
+        try:
+            size += int(stlist[-1])
+        except:
+            pass
+
+        try:
+            if stlist[-2] in sts:
+                sts[stlist[-2]] += 1
+        except:
+            pass
+    printsts(sts, size)
+
+
+except KeyboardInterrupt:
+    printsts(sts, size)
+    raise
