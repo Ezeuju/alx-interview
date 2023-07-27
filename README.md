@@ -1,2 +1,2 @@
 alx-interview
-Some python Questions
+python Questions
